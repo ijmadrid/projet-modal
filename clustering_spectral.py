@@ -10,6 +10,8 @@ Clustering spectral
 """
 
 import numpy as np
+import sklearn.cluster as skc
+import Q1 as q1
 
 def clustering_spectral(A, k, option):
     """
@@ -22,9 +24,36 @@ def clustering_spectral(A, k, option):
     """
     if option == 1:
         
-        eigvec, eigval = np.linalg.eigh(A)
+        eigval, eigvec = np.linalg.eigh(A)
         
-        U = np.zeros((n,k))
+        n = len(A)
+        U = np.zeros((k,n))
         
-        for i in range(n):
-            U[:,i] = eigvec[:,-i-1]
+        eigvec = np.transpose(eigvec)
+        
+        for i in range(k):
+            U[i] = eigvec[-i-1]
+        
+        U = np.transpose(U)
+        kmeans = skc.KMeans(n_clusters=k).fit(U)        
+        C = kmeans.labels_
+        graph = q1.graph_from_A(A)
+    
+        print A
+        print C
+        colors = []
+        for i in range(0, max(C)+1):
+            colors.append('%06X' % np.random.randint(0, 0xFFFFFF))
+        for vertex in graph.vs():
+            vertex["color"] = str('#') + colors[C[vertex.index]]          
+        q1.graph_plot(graph,"Clustering_spectral option "+str(option))   
+
+    if option == 2:
+        print '2'
+    
+    return C
+        
+testA = np.array([[1,0,1,1],
+                  [0,0,1,0],
+                  [1,1,1,1],
+                  [1,0,1,0]])

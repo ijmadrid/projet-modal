@@ -19,11 +19,11 @@ def stochastic_block_model(V,C,B):
     """
     n = len(V)
     A = np.zeros((n,n))    
-    for u in V:
-        for v in V:
-            if (np.random.rand() <= B[C[u],C[v]]):
+    for u in range(len(V)):
+        for v in range(len(V)):
+            if ( u <= v and np.random.rand() <= B[C[u],C[v]]):
                 ##  On fait l'arête u<->v
-                A[u][v] = A[u][v] = 1
+                A[u][v] = A[v][u] = 1
     
     return A
 
@@ -63,9 +63,9 @@ def test1():
     V = np.arange(10)
     C = [0,0,0,1,1,1,2,2,0,0]
     
-    B = np.array([[0.8,0.2,0.0],
-                 [0.2,0.5,0.3],
-                 [0.0,0.3,0.7]])
+    B = np.array([[0.8,0.9,0.0],
+                 [0.9,0.5,0.9],
+                 [0.0,0.9,0.7]])
     
     A = stochastic_block_model(V,C,B)
     graph = graph_from_A(A)
@@ -77,4 +77,17 @@ def test1():
         vertex["color"] = str('#') + colors[C[vertex.index]]
     
     graph_plot(graph,"test1")
+
+def visualisation():
+    A = np.load("matrices/file1.npy")
+    C = np.load("matrices/file2.npy")
+
+    graph = graph_from_A(A)
     
+    colors = []
+    for i in range(0, max(C)+1):
+        colors.append('%06X' % np.random.randint(0, 0xFFFFFF))
+    for vertex in graph.vs():
+        vertex["color"] = str('#') + colors[C[vertex.index]]
+    
+    graph_plot(graph,"option 1 Arnaud")
